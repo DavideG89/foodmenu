@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-background text-text font-sans;
+}
+
+a {
+  @apply text-primary;
+}
+
+button {
+  @apply font-medium;
+}
