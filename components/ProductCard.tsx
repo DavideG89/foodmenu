@@ -16,7 +16,7 @@ export const ProductCard = ({ product, onAdd, onOpen }: ProductCardProps) => {
 
   return (
     <article
-      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-soft transition hover:-translate-y-1"
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-soft transition-transform duration-300 ease-out hover:-translate-y-1"
       onClick={() => onOpen(product)}
     >
       <div className="relative aspect-video w-full overflow-hidden">

@@ -1,6 +1,7 @@
 export type Category = {
   name: string;
   slug: string;
+  image?: string;
 };
 
 export type Product = {
@@ -30,11 +31,11 @@ export type RestaurantInfo = {
 };
 
 export const categories: Category[] = [
-  { name: 'Burgers', slug: 'burgers' },
-  { name: 'Fries', slug: 'fries' },
-  { name: 'Drinks', slug: 'drinks' },
-  { name: 'Sides', slug: 'sides' },
-  { name: 'Specials', slug: 'specials' }
+  { name: 'Burgers', slug: 'burgers', image: '/hamburger-1.jpg' },
+  { name: 'Fries', slug: 'fries', image: '/fries1.jpg' },
+  { name: 'Drinks', slug: 'drinks', image: '/coca.jpg' },
+  { name: 'Sides', slug: 'sides', image: '/chicken-wings.jpg' },
+  { name: 'Specials', slug: 'specials', image: '/hamburger-2.jpg' }
 ];
 
 export const products: Product[] = [
@@ -44,7 +45,7 @@ export const products: Product[] = [
     description: 'Manzo 150g, cheddar fuso, cipolle caramellate e salsa della casa in bun artigianale.',
     price: 10.5,
     promoPrice: 8.5,
-    image: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b',
+    image: '/hamburger-1.jpg',
     categorySlug: 'burgers',
     badges: ['-20%']
   },
@@ -53,7 +54,7 @@ export const products: Product[] = [
     name: 'Truffle Burger',
     description: 'Burger gourmet con crema al tartufo, provola affumicata e funghi porcini.',
     price: 13.9,
-    image: 'https://images.unsplash.com/photo-1606755962773-0e7d9442b8ba',
+    image: '/hamburger-2.jpg',
     categorySlug: 'burgers',
     badges: ['Novità']
   },
@@ -62,7 +63,7 @@ export const products: Product[] = [
     name: 'Patate Rustiche',
     description: 'Patate taglio rustico doppia cottura con sale alle erbe.',
     price: 4.5,
-    image: 'https://images.unsplash.com/photo-1542838686-73e7d57c09b0',
+    image: '/fries1.jpg',
     categorySlug: 'fries'
   },
   {
@@ -70,24 +71,32 @@ export const products: Product[] = [
     name: 'Loaded Fries',
     description: 'Con cheddar, bacon croccante e salsa ranch.',
     price: 6.5,
-    image: 'https://images.unsplash.com/photo-1528834342814-5a7a67d87c5a',
+    image: '/fries2.png',
     categorySlug: 'fries',
     badges: ['Best seller']
   },
   {
     id: 'drink-01',
-    name: 'Limonata Artigianale',
-    description: 'Fresca limonata con limoni di Sorrento e menta.',
-    price: 3.8,
-    image: 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d',
+    name: 'Coca-Cola Classic',
+    description: 'La classica cola servita fredda con ghiaccio.',
+    price: 3.0,
+    image: '/coca.jpg',
     categorySlug: 'drinks'
   },
   {
     id: 'drink-02',
-    name: 'Cold Brew',
-    description: 'Estratto a freddo, servito con ghiaccio e scorza di arancia.',
-    price: 3.5,
-    image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348',
+    name: 'Fanta Aranciata',
+    description: 'Bevanda frizzante agli agrumi, perfetta per accompagnare i burger.',
+    price: 3.0,
+    image: '/fanta.jpeg',
+    categorySlug: 'drinks'
+  },
+  {
+    id: 'drink-03',
+    name: 'Acqua Naturale',
+    description: 'Bottiglietta di acqua naturale da 50cl.',
+    price: 1.5,
+    image: '/water.webp',
     categorySlug: 'drinks'
   },
   {
@@ -100,11 +109,11 @@ export const products: Product[] = [
   },
   {
     id: 'side-02',
-    name: 'Chicken Bites',
-    description: 'Bocconcini di pollo impanati con salsa piccante.',
+    name: 'Chicken Wings',
+    description: 'Alette di pollo croccanti con salsa piccante a parte.',
     price: 6.9,
     promoPrice: 5.5,
-    image: 'https://images.unsplash.com/photo-1608032362237-02f7c8b3baed',
+    image: '/chicken-wings.jpg',
     categorySlug: 'sides',
     badges: ['-20%']
   },

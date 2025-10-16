@@ -20,6 +20,7 @@ const ratingLabel = '120+ recensioni';
 
 export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState(categories[0]?.slug ?? '');
+  const [query, setQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>();
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -35,6 +36,21 @@ export default function MenuPage() {
   const { toast } = useToast();
   const promo = offers[0];
 
+  const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
+
+  const matchesQuery = useCallback(
+    (product: Product) => {
+      if (!normalizedQuery) {
+        return true;
+      }
+      return (
+        product.name.toLowerCase().includes(normalizedQuery) ||
+        product.description.toLowerCase().includes(normalizedQuery)
+      );
+    },
+    [normalizedQuery]
+  );
+
   const productsByCategory = useMemo(() => {
     return categories.reduce<Record<string, Product[]>>((acc, category) => {
       acc[category.slug] = products.filter((product) => product.categorySlug === category.slug);
@@ -42,7 +58,14 @@ export default function MenuPage() {
     }, {});
   }, [categories, products]);
 
-  const filteredProducts = productsByCategory[activeCategory] ?? [];
+  const filteredProducts = useMemo(() => {
+    const byCategory = productsByCategory[activeCategory] ?? [];
+    return byCategory.filter(matchesQuery);
+  }, [productsByCategory, activeCategory, matchesQuery]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setQuery(value);
+  }, []);
 
   const handleAdd = useCallback(
     (product: Product, quantity = 1) => {
@@ -127,30 +150,43 @@ export default function MenuPage() {
   const todayHours = restaurantInfo.hours[todayIndex];
   const phoneHref = `tel:${restaurantInfo.phone.replace(/\s+/g, '')}`;
 
-  const renderPromo = () =>
-    promo ? (
-      <div className="rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-5 text-white shadow-md shadow-emerald-200/40">
-        <span className="text-xs font-semibold uppercase tracking-wide text-white/80">
-          {promo.title}
-        </span>
-        {promo.highlight ? (
-          <p className="mt-1 text-lg font-semibold text-white">{promo.highlight}</p>
-        ) : null}
-        <p className="mt-2 text-sm text-white/80">{promo.description}</p>
-      </div>
-    ) : null;
+  const showPromo = Boolean(promo) && !normalizedQuery;
 
-  return (
-    <div className="space-y-6 lg:space-y-10">
-      <div className="lg:hidden space-y-6">
-        {renderPromo()}
-        <CategoryTabs
-          categories={categories}
-          active={activeCategory}
-          onSelect={(slug) => setActiveCategory(slug)}
-        />
-        <div className="grid grid-cols-1 gap-5 pb-8">
-          {filteredProducts.map((product) => (
+  const promoBanner = showPromo ? (
+    <div className="rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-5 text-white shadow-md shadow-emerald-200/40">
+      <span className="text-xs font-semibold uppercase tracking-wide text-white/80">
+        {promo?.title}
+      </span>
+      {promo?.highlight ? (
+        <p className="mt-1 text-lg font-semibold text-white">{promo.highlight}</p>
+      ) : null}
+      <p className="mt-2 text-sm text-white/80">{promo?.description}</p>
+    </div>
+  ) : null;
+
+  const desktopSections = categories.map((category) => {
+    const categoryProducts = (productsByCategory[category.slug] ?? []).filter(matchesQuery);
+    if (categoryProducts.length === 0) {
+      sectionRefs.current[category.slug] = null;
+      return null;
+    }
+
+    return (
+      <section
+        key={category.slug}
+        id={category.slug}
+        data-category-slug={category.slug}
+        ref={(element) => {
+          sectionRefs.current[category.slug] = element;
+        }}
+        className="scroll-mt-32 space-y-4"
+      >
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="text-2xl font-semibold text-text">{category.name}</h2>
+          <span className="text-sm text-text/50">{categoryProducts.length} prodotti</span>
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          {categoryProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -161,6 +197,42 @@ export default function MenuPage() {
               }}
             />
           ))}
+        </div>
+      </section>
+    );
+  });
+
+  const hasDesktopResults = desktopSections.some(Boolean);
+
+  return (
+    <div className="space-y-6 lg:space-y-10">
+      <div className="lg:hidden space-y-6">
+        {promoBanner}
+        <CategoryTabs
+          categories={categories}
+          active={activeCategory}
+          onSelect={(slug) => setActiveCategory(slug)}
+          searchValue={query}
+          onSearchChange={handleSearchChange}
+        />
+        <div className="grid grid-cols-1 gap-5 pb-8">
+          {filteredProducts.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-gray-200 bg-white/80 px-4 py-8 text-center text-sm text-text/60">
+              Nessun prodotto trovato. Prova a cercare un altro piatto.
+            </div>
+          ) : (
+            filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAdd={(p) => handleAdd(p)}
+                onOpen={(p) => {
+                  setSelectedProduct(p);
+                  setModalOpen(true);
+                }}
+              />
+            ))
+          )}
         </div>
       </div>
 
@@ -244,45 +316,41 @@ export default function MenuPage() {
             </aside>
 
             <div className="space-y-10">
-              {renderPromo()}
-              {categories.map((category) => {
-                const categoryProducts = productsByCategory[category.slug] ?? [];
-                if (categoryProducts.length === 0) {
-                  return null;
-                }
+              <div className="sticky top-0 z-20 bg-background/95 pb-4 pt-2 backdrop-blur">
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg">
+                    🔍
+                  </span>
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(event) => handleSearchChange(event.target.value)}
+                    placeholder="Cerca nel menù..."
+                    className="w-full rounded-2xl border border-black/5 bg-white px-12 py-3 text-sm text-text placeholder:text-text/50 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30"
+                    autoComplete="off"
+                  />
+                  {query ? (
+                    <button
+                      type="button"
+                      onClick={() => handleSearchChange('')}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-text/5 px-2 py-1 text-xs font-semibold text-text/60 transition hover:bg-text/10"
+                      aria-label="Cancella ricerca"
+                    >
+                      ✕
+                    </button>
+                  ) : null}
+                </div>
+              </div>
 
-                return (
-                  <section
-                    key={category.slug}
-                    id={category.slug}
-                    data-category-slug={category.slug}
-                    ref={(element) => {
-                      sectionRefs.current[category.slug] = element;
-                    }}
-                    className="scroll-mt-32 space-y-4"
-                  >
-                    <div className="flex items-baseline justify-between gap-3">
-                      <h2 className="text-2xl font-semibold text-text">{category.name}</h2>
-                      <span className="text-sm text-text/50">
-                        {categoryProducts.length} prodotti
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4">
-                      {categoryProducts.map((product) => (
-                        <ProductCard
-                          key={product.id}
-                          product={product}
-                          onAdd={(p) => handleAdd(p)}
-                          onOpen={(p) => {
-                            setSelectedProduct(p);
-                            setModalOpen(true);
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
+              {promoBanner}
+
+              {hasDesktopResults ? (
+                desktopSections
+              ) : (
+                <div className="rounded-3xl border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-sm text-text/60">
+                  Nessun prodotto corrisponde alla ricerca. Prova a cambiare termini o categoria.
+                </div>
+              )}
             </div>
 
             <aside className="sticky top-4 h-max space-y-4">

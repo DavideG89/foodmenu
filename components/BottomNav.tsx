@@ -39,8 +39,8 @@ export const BottomNav = () => {
               key={link.href}
               href={link.href}
               className={cn(
-                'relative flex flex-1 flex-col items-center justify-center gap-1 rounded-full text-xs font-medium transition-colors',
-                isActive ? 'text-emerald-700' : 'text-gray-500 hover:text-gray-700'
+                'relative flex flex-1 flex-col items-center justify-center gap-1 rounded-full text-xs font-medium transition-all duration-200 ease-out',
+                isActive ? 'text-emerald-700' : 'text-gray-500 hover:text-gray-700 hover:-translate-y-[1px]'
               )}
             >
               <span className="text-sm leading-none">{link.label}</span>
