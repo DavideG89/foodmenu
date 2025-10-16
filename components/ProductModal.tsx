@@ -44,27 +44,35 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" />
-        <Dialog.Content className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-background">
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60" />
+        <Dialog.Content
+          className={cn(
+            'fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-h-[90vh] flex-col overflow-hidden rounded-t-3xl bg-background shadow-2xl shadow-black/25 transition-transform',
+            'sm:inset-x-auto sm:bottom-10 sm:left-1/2 sm:w-[480px] sm:-translate-x-1/2 sm:-translate-y-2 sm:transform sm:rounded-3xl',
+            'lg:w-[520px]'
+          )}
+        >
           {product ? (
             <>
-              <div className="relative h-64 w-full">
+              <div className="relative aspect-[16/9] w-full">
                 <Image
-                  src={`${product.image}?auto=format&fit=crop&w=1200&q=80`}
+                  src={`${product.image}?auto=format&fit=crop&w=1600&q=80`}
                   alt={product.name}
                   fill
                   className="object-cover"
+                  priority
                 />
                 <Dialog.Close
                   type="button"
-                  className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-sm font-semibold text-white"
+                  className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-lg font-semibold text-white transition hover:bg-black/80"
+                  aria-label="Chiudi"
                 >
-                  Chiudi
+                  ✕
                 </Dialog.Close>
                 {product.badges?.map((badge) => (
                   <span
                     key={badge}
-                    className="absolute left-4 top-4 mt-10 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-text"
+                    className="absolute left-4 top-4 mt-12 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-text"
                   >
                     {badge}
                   </span>
@@ -108,7 +116,7 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
                   </div>
                 </div>
               </div>
-              <div className="border-t border-black/10 bg-white px-5 py-4">
+              <div className="border-t border-black/10 bg-white px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
                 <div className="mb-3 flex items-center justify-between text-base font-semibold text-text">
                   <span>Totale</span>
                   <span>{formatCurrency(total)}</span>

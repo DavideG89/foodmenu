@@ -21,6 +21,10 @@ export const BottomNav = () => {
     setHydrated(true);
   }, []);
 
+  if (pathname === '/' || pathname === '/pickup') {
+    return null;
+  }
+
   return (
     <div className="fixed inset-x-0 bottom-[calc(12px+env(safe-area-inset-bottom))] z-40 flex justify-center px-4">
       <nav className="flex w-full max-w-md items-center justify-around rounded-full border border-gray-200 bg-white px-5 py-3 pb-[env(safe-area-inset-bottom)] shadow-lg shadow-emerald-100/40 min-h-[64px]">

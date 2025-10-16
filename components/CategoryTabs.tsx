@@ -10,8 +10,8 @@ type CategoryTabsProps = {
 
 export const CategoryTabs = ({ categories, active, onSelect }: CategoryTabsProps) => {
   return (
-    <div className="sticky top-[56px] z-20 -mx-4 bg-background/95 px-4 py-3 backdrop-blur">
-      <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="sticky top-[56px] z-20 -mx-4 bg-background/95 px-4 py-3">
+      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar snap-x snap-mandatory">
         {categories.map((category) => {
           const isActive = active === category.slug;
           return (
@@ -19,10 +19,10 @@ export const CategoryTabs = ({ categories, active, onSelect }: CategoryTabsProps
               key={category.slug}
               onClick={() => onSelect(category.slug)}
               className={cn(
-                'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition',
+                'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-colors snap-start',
                 isActive
-                  ? 'border-primary bg-primary text-white shadow-soft'
-                  : 'border-black/10 bg-white text-text/80 hover:text-text'
+                  ? 'border-transparent bg-emerald-600 text-white shadow-soft'
+                  : 'border-white/10 bg-[#1C1C1C] text-white/80 hover:text-white'
               )}
             >
               {category.name}

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { categories, products, restaurantInfo, type Product } from '@/data/mockData';
+import { categories, products, restaurantInfo, offers, type Product } from '@/data/mockData';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductModal } from '@/components/ProductModal';
@@ -33,6 +33,7 @@ export default function MenuPage() {
   const subtotal = useCartStore((state) => state.subtotal());
 
   const { toast } = useToast();
+  const promo = offers[0];
 
   const productsByCategory = useMemo(() => {
     return categories.reduce<Record<string, Product[]>>((acc, category) => {
@@ -126,9 +127,23 @@ export default function MenuPage() {
   const todayHours = restaurantInfo.hours[todayIndex];
   const phoneHref = `tel:${restaurantInfo.phone.replace(/\s+/g, '')}`;
 
+  const renderPromo = () =>
+    promo ? (
+      <div className="rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-5 text-white shadow-md shadow-emerald-200/40">
+        <span className="text-xs font-semibold uppercase tracking-wide text-white/80">
+          {promo.title}
+        </span>
+        {promo.highlight ? (
+          <p className="mt-1 text-lg font-semibold text-white">{promo.highlight}</p>
+        ) : null}
+        <p className="mt-2 text-sm text-white/80">{promo.description}</p>
+      </div>
+    ) : null;
+
   return (
     <div className="space-y-6 lg:space-y-10">
       <div className="lg:hidden space-y-6">
+        {renderPromo()}
         <CategoryTabs
           categories={categories}
           active={activeCategory}
@@ -229,6 +244,7 @@ export default function MenuPage() {
             </aside>
 
             <div className="space-y-10">
+              {renderPromo()}
               {categories.map((category) => {
                 const categoryProducts = productsByCategory[category.slug] ?? [];
                 if (categoryProducts.length === 0) {
