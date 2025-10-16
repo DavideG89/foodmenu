@@ -20,15 +20,22 @@ export const FloatingCart = () => {
   }
 
   return (
-    <div className="fixed bottom-[calc(84px+env(safe-area-inset-bottom)+env(safe-area-inset-bottom))] left-0 right-0 z-50 flex justify-center">
+    <div className="pointer-events-none fixed bottom-[calc(84px+env(safe-area-inset-bottom)+env(safe-area-inset-bottom))] left-0 right-0 z-50 flex justify-center px-4">
       <Link
         href="/cart"
         className={cn(
-          'flex w-[90%] max-w-sm items-center justify-between rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white shadow-soft transition hover:bg-primary/90'
+          'pointer-events-auto flex w-full max-w-lg items-center justify-between rounded-3xl bg-primary px-6 py-4 text-base font-semibold text-white shadow-[0_20px_40px_-15px_rgba(0,179,126,0.45)] transition-all duration-300 hover:translate-y-[-2px] hover:bg-primary/95 active:translate-y-0'
         )}
       >
-        <span>🛒 {count}</span>
-        <span>• {formatCurrency(subtotal)}</span>
+        <span className="flex items-center gap-2">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-lg">
+            🛒
+          </span>
+          {count} articoli
+        </span>
+        <span className="rounded-full bg-white/20 px-4 py-2 text-sm font-semibold">
+          {formatCurrency(subtotal)}
+        </span>
       </Link>
     </div>
   );
