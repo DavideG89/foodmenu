@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppProviders>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-32 pt-4">
+            <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-32 pt-4 lg:px-6">
               {children}
             </main>
             <FloatingCart />
