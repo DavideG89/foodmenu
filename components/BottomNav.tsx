@@ -7,7 +7,7 @@ import { useCartStore } from '@/lib/store/cart-store';
 import { useEffect, useState } from 'react';
 
 const links = [
-  { href: '/pickup', label: 'Home' },
+  { href: '/', label: 'Home' },
   { href: '/menu', label: 'Menu' },
   { href: '/info', label: 'Info' }
 ];
@@ -26,7 +26,9 @@ export const BottomNav = () => {
       <nav className="flex w-full max-w-md items-center justify-around rounded-full border border-gray-200 bg-white px-5 py-3 pb-[env(safe-area-inset-bottom)] shadow-lg shadow-emerald-100/40 min-h-[64px]">
         {links.map((link) => {
           const isActive =
-            pathname === link.href || (pathname?.startsWith(link.href) && link.href !== '/pickup');
+            link.href === '/'
+              ? pathname === '/'
+              : pathname === link.href || pathname?.startsWith(`${link.href}/`);
 
           return (
             <Link
