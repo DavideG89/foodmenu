@@ -19,6 +19,19 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const previousOverflow = document.body.style.overflow;
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = previousOverflow;
+    }
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
+  useEffect(() => {
     setQuantity(1);
   }, [product?.id, open]);
 
@@ -42,7 +55,10 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
                   fill
                   className="object-cover"
                 />
-                <Dialog.Close className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-sm font-semibold text-white">
+                <Dialog.Close
+                  type="button"
+                  className="absolute left-4 top-4 rounded-full bg-black/60 px-3 py-1 text-sm font-semibold text-white"
+                >
                   Chiudi
                 </Dialog.Close>
                 {product.badges?.map((badge) => (
@@ -93,6 +109,10 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
                 </div>
               </div>
               <div className="border-t border-black/10 bg-white px-5 py-4">
+                <div className="mb-3 flex items-center justify-between text-base font-semibold text-text">
+                  <span>Totale</span>
+                  <span>{formatCurrency(total)}</span>
+                </div>
                 <Button
                   fullWidth
                   onClick={() => {
@@ -100,7 +120,7 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
                     onAdd(product, quantity);
                   }}
                 >
-                  Aggiungi al carrello • {formatCurrency(total)}
+                  Aggiungi al carrello
                 </Button>
               </div>
             </>

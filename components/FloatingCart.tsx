@@ -27,8 +27,8 @@ export const FloatingCart = () => {
           'flex w-[90%] max-w-sm items-center justify-between rounded-2xl bg-primary px-5 py-4 text-base font-semibold text-white shadow-soft transition hover:bg-primary/90'
         )}
       >
-        <span>🛒 {count} prodotti</span>
-        <span>{formatCurrency(subtotal)}</span>
+        <span>🛒 {count}</span>
+        <span>• {formatCurrency(subtotal)}</span>
       </Link>
     </div>
   );
