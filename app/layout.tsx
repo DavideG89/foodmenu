@@ -1,12 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { AppProviders } from '@/components/layout/AppProviders';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { FloatingCart } from '@/components/FloatingCart';
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'GreenBurger Delivery',
@@ -16,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="it">
-      <body className={`${inter.variable} bg-background text-text`}>
+      <body className="bg-background text-text font-sans">
         <AppProviders>
           <div className="flex min-h-screen flex-col">
             <Header />

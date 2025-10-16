@@ -10,7 +10,7 @@ module.exports = {
         text: '#222222'
       },
       fontFamily: {
-        sans: ['var(--font-inter)']
+        sans: ['Inter', 'system-ui', 'sans-serif']
       },
       borderRadius: {
         xl: '16px'
