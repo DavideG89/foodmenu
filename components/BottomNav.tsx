@@ -22,29 +22,37 @@ export const BottomNav = () => {
   }, []);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-black/5 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-3xl items-stretch justify-between px-2 py-2">
+    <div className="fixed inset-x-0 bottom-[calc(12px+env(safe-area-inset-bottom))] z-40 flex justify-center px-4">
+      <nav className="flex w-full max-w-md items-center justify-around rounded-full border border-gray-200 bg-white px-5 py-3 pb-[env(safe-area-inset-bottom)] shadow-lg shadow-emerald-100/40 min-h-[64px]">
         {links.map((link) => {
-          const isActive = pathname === link.href || (pathname?.startsWith(link.href) && link.href !== '/pickup');
+          const isActive =
+            pathname === link.href || (pathname?.startsWith(link.href) && link.href !== '/pickup');
+
           return (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                'relative flex-1 rounded-xl px-3 py-2 text-center text-sm font-semibold transition',
-                isActive ? 'text-primary' : 'text-text/70'
+                'relative flex flex-1 flex-col items-center justify-center gap-1 rounded-full text-xs font-medium transition-colors',
+                isActive ? 'text-emerald-700' : 'text-gray-500 hover:text-gray-700'
               )}
             >
-              {link.label}
+              <span className="text-sm leading-none">{link.label}</span>
+              <span
+                className={cn(
+                  'h-1 w-2 rounded-full transition-colors',
+                  isActive ? 'bg-emerald-600' : 'bg-transparent'
+                )}
+              />
               {link.href === '/menu' && hydrated && count > 0 ? (
-                <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                <span className="absolute -top-1 right-3 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
                   {count}
                 </span>
               ) : null}
             </Link>
           );
         })}
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 };

@@ -20,13 +20,30 @@ type CartState = {
   subtotal: () => number;
 };
 
+const createMemoryStorage = (): Storage => {
+  let store: Record<string, string> = {};
+
+  return {
+    getItem: (name: string) => (name in store ? store[name] : null),
+    setItem: (name: string, value: string) => {
+      store[name] = value;
+    },
+    removeItem: (name: string) => {
+      delete store[name];
+    },
+    clear: () => {
+      store = {};
+    },
+    key: (index: number) => Object.keys(store)[index] ?? null,
+    get length() {
+      return Object.keys(store).length;
+    }
+  };
+};
+
 const storage = createJSONStorage(() => {
   if (typeof window === 'undefined') {
-    return {
-      getItem: () => null,
-      setItem: () => {},
-      removeItem: () => {}
-    } as Storage;
+    return createMemoryStorage();
   }
   return window.localStorage;
 });

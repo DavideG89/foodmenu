@@ -20,7 +20,7 @@ export const FloatingCart = () => {
   }
 
   return (
-    <div className="fixed bottom-16 left-0 right-0 z-40 flex justify-center">
+    <div className="fixed bottom-[calc(84px+env(safe-area-inset-bottom)+env(safe-area-inset-bottom))] left-0 right-0 z-50 flex justify-center">
       <Link
         href="/cart"
         className={cn(
