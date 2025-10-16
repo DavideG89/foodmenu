@@ -44,12 +44,8 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity data-[state=open]:opacity-100 data-[state=closed]:opacity-0"
-        />
-        <Dialog.Content
-          className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-background transition-transform duration-300 ease-out data-[state=open]:translate-y-0 data-[state=closed]:translate-y-full"
-        >
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" />
+        <Dialog.Content className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-background">
           {product ? (
             <>
               <div className="relative h-64 w-full">
