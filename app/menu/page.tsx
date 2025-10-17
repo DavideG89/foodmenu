@@ -70,7 +70,11 @@ export default function MenuPage() {
   const handleAdd = useCallback(
     (product: Product, quantity = 1) => {
       add(product, quantity);
-      toast({ title: 'Aggiunto al carrello', description: product.name });
+      toast({
+        title: 'Aggiunto al carrello',
+        description: product.name,
+        duration: 3000
+      });
     },
     [add, toast]
   );
@@ -238,9 +242,9 @@ export default function MenuPage() {
 
       <div className="hidden lg:block">
         <div className="mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-[280px_minmax(0,1fr)_320px] gap-6 pb-12">
-            <aside className="sticky top-4 h-max space-y-4">
-              <div className="rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
+          <div className="mb-6 rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
                     GB
@@ -250,7 +254,7 @@ export default function MenuPage() {
                     <p className="text-sm text-text/60">{restaurantInfo.address}</p>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center gap-3 text-sm text-text/70">
+                <div className="flex items-center gap-3 text-sm text-text/70">
                   <span className="flex items-center gap-1 text-primary">
                     <span aria-hidden="true">⭐️</span>
                     {ratingValue}
@@ -258,13 +262,12 @@ export default function MenuPage() {
                   <span>{ratingLabel}</span>
                 </div>
                 {todayHours ? (
-                  <p className="mt-3 text-sm text-text/70">
+                  <p className="text-sm text-text/70">
                     Oggi: {todayHours.open} - {todayHours.close}
                   </p>
                 ) : null}
               </div>
-
-              <div className="grid gap-3 rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
+              <div className="flex flex-col gap-3 sm:max-w-xs lg:ml-auto lg:w-64">
                 <Button asChild fullWidth className="gap-2">
                   <Link href={phoneHref}>
                     <span aria-hidden="true">📞</span> Chiama
@@ -276,12 +279,19 @@ export default function MenuPage() {
                   variant="secondary"
                   className="gap-2"
                 >
-                  <Link href={restaurantInfo.mapsUrl} target="_blank" rel="noopener noreferrer">
+                  <Link
+                    href={restaurantInfo.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <span aria-hidden="true">🗺️</span> Indicazioni
                   </Link>
                 </Button>
               </div>
-
+            </div>
+          </div>
+          <div className="grid grid-cols-[280px_minmax(0,1fr)_320px] gap-6 pb-12">
+            <aside className="sticky top-[5.5rem] h-max space-y-4">
               <div className="rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-text/60">
                   Categorie
@@ -294,13 +304,31 @@ export default function MenuPage() {
                         key={category.slug}
                         onClick={() => handleCategoryClick(category.slug)}
                         className={cn(
-                          'flex items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
+                          'flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
                           isActive
                             ? 'bg-primary/10 text-primary'
                             : 'text-text/60 hover:text-text'
                         )}
                       >
-                        <span>{category.name}</span>
+                        <span className="flex items-center gap-3">
+                          {category.image ? (
+                            <span
+                              className={cn(
+                                'relative h-8 w-8  transition-colors',
+                                isActive ? 'border-primary/60' : 'border-black/5 bg-white'
+                              )}
+                            >
+                              <Image
+                                src={category.image}
+                                alt={category.name}
+                                width={32}
+                                height={32}
+                                className="h-full w-full "
+                              />
+                            </span>
+                          ) : null}
+                          <span>{category.name}</span>
+                        </span>
                         <span
                           className={cn(
                             'h-2 w-2 rounded-full transition-colors',
@@ -316,7 +344,7 @@ export default function MenuPage() {
             </aside>
 
             <div className="space-y-10">
-              <div className="sticky top-0 z-20 bg-background/95 pb-4 pt-2 backdrop-blur">
+              <div className="sticky top-[4.5rem] z-20 bg-background/95 pb-4 pt-2 backdrop-blur">
                 <div className="relative">
                   <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg">
                     🔍
@@ -353,7 +381,7 @@ export default function MenuPage() {
               )}
             </div>
 
-            <aside className="sticky top-4 h-max space-y-4">
+            <aside className="sticky top-[5.5rem] h-max space-y-4">
               <div className="rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
                 <h2 className="text-xl font-semibold text-text">Il tuo carrello</h2>
                 {items.length === 0 ? (

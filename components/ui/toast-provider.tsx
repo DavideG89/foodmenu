@@ -32,7 +32,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
-      <ToastPrimitive.Provider swipeDirection="right">
+      <ToastPrimitive.Provider swipeDirection="down">
         {children}
         {toasts.map((toast) => (
           <ToastPrimitive.Root
@@ -45,7 +45,9 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
             }}
             defaultOpen
             className={cn(
-              'pointer-events-auto relative flex w-[320px] flex-col gap-1 rounded-xl bg-white p-4 shadow-soft ring-1 ring-black/5'
+              'pointer-events-auto relative flex w-[320px] flex-col gap-1 rounded-xl bg-white p-4 shadow-soft ring-1 ring-black/5',
+              'data-[state=open]:animate-in data-[state=open]:slide-in-from-top/10 data-[state=open]:fade-in',
+              'data-[state=closed]:animate-out data-[state=closed]:slide-out-to-top/10 data-[state=closed]:fade-out'
             )}
           >
             {toast.title ? (
@@ -60,7 +62,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
             ) : null}
           </ToastPrimitive.Root>
         ))}
-        <ToastPrimitive.Viewport className="fixed bottom-24 right-4 z-[100] flex max-h-screen w-full max-w-[320px] flex-col gap-3 outline-none" />
+        <ToastPrimitive.Viewport className="fixed left-1/2 top-20 z-[100] flex max-h-screen w-full max-w-[320px] -translate-x-1/2 flex-col gap-3 outline-none sm:top-24" />
       </ToastPrimitive.Provider>
     </ToastContext.Provider>
   );

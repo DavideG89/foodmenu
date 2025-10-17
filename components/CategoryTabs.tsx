@@ -36,7 +36,7 @@ export const CategoryTabs = ({
               value={searchValue ?? ''}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Cerca nel menù..."
-              className="w-full rounded-2xl border border-white/10 bg-[#1C1C1C] px-12 py-3 text-sm text-white placeholder:text-white/50 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/40"
+              className="w-full rounded-2xl border border-white/10 bg-white px-12 py-3 text-sm text-text placeholder:text-text/50 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/40"
               autoComplete="off"
             />
             {searchValue ? (
@@ -52,7 +52,7 @@ export const CategoryTabs = ({
           </div>
         </div>
       ) : null}
-      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar snap-x snap-mandatory">
+      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
         {categories.map((category) => {
           const isActive = active === category.slug;
           return (
@@ -60,25 +60,31 @@ export const CategoryTabs = ({
               key={category.slug}
               onClick={() => onSelect(category.slug)}
               className={cn(
-                'whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-300 ease-out snap-start',
+                'flex w-24 flex-col items-center rounded-2xl border px-4 py-3 text-xs font-semibold transition-all duration-300 ease-out',
                 isActive
-                  ? 'border-transparent bg-emerald-600 text-white shadow-soft'
-                  : 'border-white/10 bg-[#1C1C1C] text-white/80 hover:text-white'
+                  ? ' bg-primary/10 text-white'
+                  : 'border-white/10  text-white/80 hover:text-white'
               )}
             >
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center">
                 {category.image ? (
-                  <span className="relative h-6 w-6 overflow-hidden rounded-full border border-white/10">
+                  <span
+                    className={cn(
+                      'relative h-10 w-10  transition-colors'
+                    )}
+                  >
                     <Image
                       src={category.image}
                       alt={category.name}
-                      fill
-                      className="object-cover"
-                      sizes="24px"
+                      width={32}
+                      height={32}
+                      className="h-full w-full  transition-transform duration-300 ease-out group-hover:scale-105"
                     />
                   </span>
                 ) : null}
-                <span>{category.name}</span>
+              </span>
+              <span className="mt-3 text-xs font-medium leading-tight text-black">
+                {category.name}
               </span>
             </button>
           );

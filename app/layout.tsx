@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
             <FloatingCart />
-            <BottomNav />
+            { /* <BottomNav /> */}
           </div>
         </AppProviders>
       </body>

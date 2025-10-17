@@ -31,11 +31,10 @@ export type RestaurantInfo = {
 };
 
 export const categories: Category[] = [
-  { name: 'Burgers', slug: 'burgers', image: '/hamburger-1.jpg' },
-  { name: 'Fries', slug: 'fries', image: '/fries1.jpg' },
-  { name: 'Drinks', slug: 'drinks', image: '/coca.jpg' },
-  { name: 'Sides', slug: 'sides', image: '/chicken-wings.jpg' },
-  { name: 'Specials', slug: 'specials', image: '/hamburger-2.jpg' }
+  { name: 'Burgers', slug: 'burgers', image: '/Hamburgericon.png' },
+  { name: 'Drinks', slug: 'drinks', image: '/Drinkicon.png' },
+  { name: 'Sides', slug: 'sides', image: '/Sideicon.png' },
+  { name: 'Specials', slug: 'specials', image: '/Specialsicon.png' }
 ];
 
 export const products: Product[] = [
@@ -64,7 +63,7 @@ export const products: Product[] = [
     description: 'Patate taglio rustico doppia cottura con sale alle erbe.',
     price: 4.5,
     image: '/fries1.jpg',
-    categorySlug: 'fries'
+    categorySlug: 'sides'
   },
   {
     id: 'fries-02',
@@ -72,7 +71,7 @@ export const products: Product[] = [
     description: 'Con cheddar, bacon croccante e salsa ranch.',
     price: 6.5,
     image: '/fries2.png',
-    categorySlug: 'fries',
+    categorySlug: 'sides',
     badges: ['Best seller']
   },
   {
