@@ -70,14 +70,14 @@ export const CategoryTabs = ({
                 {category.image ? (
                   <span
                     className={cn(
-                      'relative h-10 w-10  transition-colors'
+                      'relative h-14 w-14  transition-colors'
                     )}
                   >
                     <Image
                       src={category.image}
                       alt={category.name}
-                      width={32}
-                      height={32}
+                      width={48}
+                      height={48}
                       className="h-full w-full  transition-transform duration-300 ease-out group-hover:scale-105"
                     />
                   </span>
