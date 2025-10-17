@@ -76,8 +76,8 @@ export const CategoryTabs = ({
                     <Image
                       src={category.image}
                       alt={category.name}
-                      width={48}
-                      height={48}
+                      width={40}
+                      height={40}
                       className="h-full w-full  transition-transform duration-300 ease-out group-hover:scale-105"
                     />
                   </span>
