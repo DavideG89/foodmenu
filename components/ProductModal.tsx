@@ -44,11 +44,13 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60" />
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60 data-[state=open]:animate-overlay-in data-[state=closed]:animate-overlay-out" />
         <Dialog.Content
           className={cn(
-            'fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-h-[90vh] flex-col overflow-hidden rounded-t-3xl bg-background shadow-2xl shadow-black/25 transition-transform',
-            'sm:inset-x-auto sm:bottom-10 sm:left-1/2 sm:w-[480px] sm:-translate-x-1/2 sm:-translate-y-2 sm:transform sm:rounded-3xl',
+            'fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-h-[90vh] flex-col overflow-hidden rounded-t-3xl bg-background shadow-2xl shadow-black/25',
+            'max-sm:translate-y-full max-sm:data-[state=open]:animate-sheet-in max-sm:data-[state=closed]:animate-sheet-out',
+            'sm:inset-x-auto sm:bottom-10 sm:left-1/2 sm:w-[480px] sm:-translate-x-1/2 sm:translate-y-4 sm:rounded-3xl sm:bg-white/90 sm:backdrop-blur sm:opacity-0 sm:shadow-[0_35px_65px_rgba(30,48,6,0.25)] sm:transition-none',
+            'sm:data-[state=open]:animate-modal-in sm:data-[state=closed]:animate-modal-out',
             'lg:w-[520px]'
           )}
         >

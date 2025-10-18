@@ -20,20 +20,36 @@ export const FloatingCart = () => {
   }
 
   return (
-    <div className="fixed bottom-[calc(84px+env(safe-area-inset-bottom)+env(safe-area-inset-bottom))] left-0 right-0 z-50 flex justify-end px-4">
+    <div
+      className="fixed inset-x-0 bottom-0 z-50 px-4 lg:hidden"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
+    >
       <Link
         href="/cart"
         className={cn(
-          'pointer-events-auto relative flex h-16 w-16 items-center justify-center rounded-full bg-white border border-primary text-xl text-white shadow-[0_25px_45px_-18px_rgba(0,179,126,0.6)] transition-all duration-300 hover:-translate-y-1 hover:bg-primary/95 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
-          'after:absolute after:-right-3 after:-top-3 after:flex after:h-6 after:min-w-[1.75rem] after:items-center after:justify-center after:rounded-full after:bg-yellow-400 after:px-2 after:text-xs after:font-semibold after:text-primary after:content-[attr(data-count)]'
+          'block rounded-t-3xl border border-primary/40 bg-primary px-5 py-4 text-pearl shadow-[0_-18px_36px_rgba(30,48,6,0.25)] transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-pearl focus-visible:ring-accent'
         )}
-        data-count={count}
         aria-label={`Vai al carrello: ${count} articoli, totale ${formatCurrency(subtotal)}`}
       >
-        🛒  
-        <span className="pointer-events-none absolute right-full mr-3 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white shadow-sm backdrop-blur">
-        
-        </span>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-pearl/15 text-2xl">
+              🛒
+            </span>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold uppercase tracking-widest text-pearl/80">
+                Carrello
+              </span>
+              <span className="text-base font-semibold">
+                {count} {count === 1 ? 'articolo' : 'articoli'}
+              </span>
+            </div>
+          </div>
+          <div className="text-right">
+            <span className="text-sm text-pearl/80">Totale</span>
+            <p className="text-lg font-semibold">{formatCurrency(subtotal)}</p>
+          </div>
+        </div>
       </Link>
     </div>
   );

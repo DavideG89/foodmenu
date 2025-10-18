@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 export const Header = () => {
   const router = useRouter();
@@ -30,6 +31,14 @@ export const Header = () => {
         <p className={cn('hidden text-sm font-medium text-text/80 sm:block')}>
           Ritiro in sede • Contanti
         </p>
+        <div className="flex items-center gap-3">
+          <Button asChild variant="secondary" className=" bg-accent text-pearl hover:text-text hidden sm:inline-flex text-sm px-5 py-2.5">
+            <Link href="/menu">Ordina ora</Link>
+          </Button>
+          <Button asChild variant="secondary" className="sm:hidden text-sm px-4 py-2">
+            <Link href="/menu">Ordina ora</Link>
+          </Button>
+        </div>
       </div>
     </header>
   );

@@ -30,7 +30,7 @@ export const ProductCard = ({ product, onAdd, onOpen }: ProductCardProps) => {
         {product.badges?.map((badge) => (
           <span
             key={badge}
-            className="absolute left-3 top-3 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-text"
+            className="absolute left-3 top-3 rounded-full bg-gleam px-3 py-1 text-xs font-semibold text-moss shadow"
           >
             {badge}
           </span>

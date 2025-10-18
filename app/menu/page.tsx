@@ -3,7 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { categories, products, restaurantInfo, offers, type Product } from '@/data/mockData';
+import {
+  categories,
+  products,
+  restaurantInfo,
+  offers,
+  type Product,
+  type Category
+} from '@/data/mockData';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductModal } from '@/components/ProductModal';
@@ -19,7 +26,11 @@ const ratingValue = '4.8';
 const ratingLabel = '120+ recensioni';
 
 export default function MenuPage() {
-  const [activeCategory, setActiveCategory] = useState(categories[0]?.slug ?? '');
+  const menuCategories = useMemo<Category[]>(
+    () => [{ name: 'I più venduti', slug: 'best-sellers', image: '/Piuvenduti.png' }, ...categories],
+    [categories]
+  );
+  const [activeCategory, setActiveCategory] = useState(menuCategories[0]?.slug ?? '');
   const [query, setQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>();
   const [isModalOpen, setModalOpen] = useState(false);
@@ -38,6 +49,16 @@ export default function MenuPage() {
 
   const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
 
+  const bestSellerProducts = useMemo(() => {
+    const flagged = products.filter((product) =>
+      product.badges?.some((badge) => badge.toLowerCase().includes('best'))
+    );
+    if (flagged.length > 0) {
+      return flagged;
+    }
+    return products.slice(0, 6);
+  }, [products]);
+
   const matchesQuery = useCallback(
     (product: Product) => {
       if (!normalizedQuery) {
@@ -52,11 +73,14 @@ export default function MenuPage() {
   );
 
   const productsByCategory = useMemo(() => {
-    return categories.reduce<Record<string, Product[]>>((acc, category) => {
-      acc[category.slug] = products.filter((product) => product.categorySlug === category.slug);
-      return acc;
-    }, {});
-  }, [categories, products]);
+    return categories.reduce<Record<string, Product[]>>(
+      (acc, category) => {
+        acc[category.slug] = products.filter((product) => product.categorySlug === category.slug);
+        return acc;
+      },
+      { 'best-sellers': bestSellerProducts }
+    );
+  }, [categories, products, bestSellerProducts]);
 
   const filteredProducts = useMemo(() => {
     const byCategory = productsByCategory[activeCategory] ?? [];
@@ -157,18 +181,18 @@ export default function MenuPage() {
   const showPromo = Boolean(promo) && !normalizedQuery;
 
   const promoBanner = showPromo ? (
-    <div className="rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-5 text-white shadow-md shadow-emerald-200/40">
-      <span className="text-xs font-semibold uppercase tracking-wide text-white/80">
+    <div className="rounded-3xl border border-gleam/60 bg-gleam p-5 text-moss shadow-[0_24px_48px_rgba(255,231,135,0.45)]">
+      <span className="text-xs font-semibold uppercase tracking-wide text-moss/80">
         {promo?.title}
       </span>
       {promo?.highlight ? (
-        <p className="mt-1 text-lg font-semibold text-white">{promo.highlight}</p>
+        <p className="mt-1 text-lg font-semibold text-moss">{promo.highlight}</p>
       ) : null}
-      <p className="mt-2 text-sm text-white/80">{promo?.description}</p>
+      <p className="mt-2 text-sm text-moss/75">{promo?.description}</p>
     </div>
   ) : null;
 
-  const desktopSections = categories.map((category) => {
+  const desktopSections = menuCategories.map((category) => {
     const categoryProducts = (productsByCategory[category.slug] ?? []).filter(matchesQuery);
     if (categoryProducts.length === 0) {
       sectionRefs.current[category.slug] = null;
@@ -213,7 +237,7 @@ export default function MenuPage() {
       <div className="lg:hidden space-y-6">
         {promoBanner}
         <CategoryTabs
-          categories={categories}
+          categories={menuCategories}
           active={activeCategory}
           onSelect={(slug) => setActiveCategory(slug)}
           searchValue={query}
@@ -292,50 +316,37 @@ export default function MenuPage() {
           </div>
           <div className="grid grid-cols-[280px_minmax(0,1fr)_320px] gap-6 pb-12">
             <aside className="sticky top-[5.5rem] h-max space-y-4">
-              <div className="rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-text/60">
-                  Categorie
-                </h3>
-                <div className="mt-4 flex flex-col gap-1">
-                  {categories.map((category) => {
+              <div className="rounded-3xl  p-6  shadow-emerald-100/40">
+                <div className="flex flex-col gap-1">
+                  {menuCategories.map((category) => {
                     const isActive = activeCategory === category.slug;
                     return (
                       <button
                         key={category.slug}
                         onClick={() => handleCategoryClick(category.slug)}
                         className={cn(
-                          'flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
+                          'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
                           isActive
-                            ? 'bg-primary/10 text-primary'
+                            ? 'bg-primary/15 text-primary'
                             : 'text-text/60 hover:text-text'
                         )}
                       >
-                        <span className="flex items-center gap-3">
-                          {category.image ? (
-                            <span
-                              className={cn(
-                                'relative h-8 w-8  transition-colors',
-                                isActive ? 'border-primary/60' : 'border-black/5 bg-white'
-                              )}
-                            >
-                              <Image
-                                src={category.image}
-                                alt={category.name}
-                                width={32}
-                                height={32}
-                                className="h-full w-full "
-                              />
-                            </span>
-                          ) : null}
-                          <span>{category.name}</span>
-                        </span>
-                        <span
-                          className={cn(
-                            'h-2 w-2 rounded-full transition-colors',
-                            isActive ? 'bg-primary' : 'bg-transparent'
-                          )}
-                          aria-hidden="true"
-                        />
+                        {category.image ? (
+                          <span className="relative h-8 w-8 overflow-hidden">
+                            <Image
+                              src={category.image}
+                              alt={category.name}
+                              width={32}
+                              height={32}
+                              className="h-full w-full object-contain"
+                            />
+                          </span>
+                        ) : (
+                          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-xs text-primary">
+                            ★
+                          </span>
+                        )}
+                        <span>{category.name}</span>
                       </button>
                     );
                   })}

@@ -2,20 +2,84 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useCartStore } from '@/lib/store/cart-store';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/format';
+import { useToast } from '@/components/ui/toast-provider';
+
+type DiscountRule =
+  | { type: 'percent'; value: number }
+  | { type: 'amount'; value: number };
+
+const DISCOUNT_CODES: Record<string, DiscountRule> = {
+  GREEN10: { type: 'percent', value: 0.1 },
+  BURGER5: { type: 'amount', value: 5 }
+};
 
 export default function CartPage() {
   const { items, inc, dec, remove, clear, subtotal } = useCartStore();
   const [hydrated, setHydrated] = useState(false);
+  const [codeInput, setCodeInput] = useState('');
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     setHydrated(true);
   }, []);
 
-  const total = hydrated ? subtotal() : 0;
+  const rawTotal = useMemo(() => (hydrated ? subtotal() : 0), [hydrated, subtotal]);
+  const discountRule = appliedCode ? DISCOUNT_CODES[appliedCode] : undefined;
+  const discountAmount = useMemo(() => {
+    if (!discountRule) {
+      return 0;
+    }
+    if (discountRule.type === 'percent') {
+      return rawTotal * discountRule.value;
+    }
+    return Math.min(discountRule.value, rawTotal);
+  }, [discountRule, rawTotal]);
+  const total = Math.max(rawTotal - discountAmount, 0);
+
+  const handleApplyCode = () => {
+    const normalized = codeInput.trim().toUpperCase();
+    if (!normalized) {
+      toast({
+        title: 'Codice vuoto',
+        description: 'Inserisci un codice sconto per applicarlo.',
+        duration: 3000
+      });
+      return;
+    }
+    const rule = DISCOUNT_CODES[normalized];
+    if (!rule) {
+      toast({
+        title: 'Codice non valido',
+        description: 'Verifica di avere un codice corretto.',
+        duration: 3000
+      });
+      return;
+    }
+    setAppliedCode(normalized);
+    setCodeInput('');
+    toast({
+      title: 'Codice applicato',
+      description:
+        rule.type === 'percent'
+          ? `Sconto del ${Math.round(rule.value * 100)}% attivato.`
+          : `Sconto di ${formatCurrency(rule.value)} attivato.`,
+      duration: 3000
+    });
+  };
+
+  const handleRemoveCode = () => {
+    setAppliedCode(null);
+    toast({
+      title: 'Codice rimosso',
+      description: 'Il codice sconto non è più attivo.',
+      duration: 3000
+    });
+  };
 
   if (!hydrated || items.length === 0) {
     return (
@@ -83,6 +147,48 @@ export default function CartPage() {
       </div>
 
       <div className="rounded-2xl bg-white p-4 shadow-soft">
+        <div className="space-y-3">
+          <label className="block text-sm font-semibold text-text">Codice sconto</label>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              type="text"
+              value={codeInput}
+              onChange={(event) => setCodeInput(event.target.value)}
+              placeholder="Inserisci il codice"
+              className="flex-1 rounded-xl border border-black/10 bg-white px-4 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+              autoCapitalize="characters"
+            />
+            {appliedCode ? (
+              <Button variant="ghost" onClick={handleRemoveCode} className="sm:w-auto">
+                Rimuovi
+              </Button>
+            ) : (
+              <Button onClick={handleApplyCode} className="sm:w-auto">
+                Applica
+              </Button>
+            )}
+          </div>
+          {appliedCode ? (
+            <p className="text-xs text-primary">
+              Codice <span className="font-semibold">{appliedCode}</span>{' '}
+              {discountRule?.type === 'percent'
+                ? `- ${Math.round((discountRule?.value ?? 0) * 100)}%`
+                : `- ${formatCurrency(discountRule?.value ?? 0)}`}
+            </p>
+          ) : null}
+        </div>
+        <div className="mt-6 space-y-2 text-sm text-text/70">
+          <div className="flex items-center justify-between">
+            <span>Subtotale</span>
+            <span>{formatCurrency(rawTotal)}</span>
+          </div>
+          {discountAmount > 0 ? (
+            <div className="flex items-center justify-between text-primary">
+              <span>Sconto</span>
+              <span>-{formatCurrency(discountAmount)}</span>
+            </div>
+          ) : null}
+        </div>
         <div className="flex items-center justify-between text-base font-semibold text-text">
           <span>Totale</span>
           <span>{formatCurrency(total)}</span>
