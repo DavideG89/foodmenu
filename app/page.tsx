@@ -53,15 +53,14 @@ export default function Home() {
 
         <div className="relative mx-auto flex w-full max-w-[1200px] flex-col gap-24 px-6 pt-12 sm:gap-28 md:px-10 lg:px-16 lg:pt-20">
           <section className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-            <div className="space-y-6 lg:max-w-4xl">
-          
+            <div className="space-y-6 text-center sm:text-left lg:max-w-4xl">
               <h1 className="text-4xl font-bold leading-tight text-text sm:text-5xl">
                 Serviamo cibo <span className="text-accent">squisito</span> ogni giorno
               </h1>
-              <p className="max-w-xl text-sm text-text/70 sm:text-base">
+              <p className="mx-auto max-w-xl text-sm text-text/70 sm:mx-0 sm:text-base">
                 Smash burger, sides croccanti e drink artigianali. Che tu voglia fermarti o prendere da asporto, sei nel posto giusto per gustare street food di qualità.
               </p>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
                 <Button asChild>
                   <Link href="/menu">Vai al menù</Link>
                 </Button>
@@ -69,7 +68,7 @@ export default function Home() {
                   <Link href="/pickup">Preferisci il pickup?</Link>
                 </Button>
               </div>
-              <div className="grid gap-4 pt-6 sm:grid-cols-3">
+              <div className="grid gap-4 pt-6 min-[380px]:grid-cols-2 sm:grid-cols-3">
                 {heroHighlights.map((item) => (
                   <div
                     key={item.label}
@@ -82,7 +81,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative mt-10 aspect-square w-full max-w-lg justify-self-end rounded-full bg-gleam/50 p-6 sm:p-10 lg:mt-0">
+            <div className="relative mt-6 aspect-square w-full max-w-[280px] self-center rounded-full bg-gleam/50 p-6 sm:max-w-sm sm:p-8 lg:mt-0 lg:max-w-lg lg:self-auto lg:justify-self-end">
               <span className="absolute -left-6 top-10 hidden h-20 w-20 rounded-full bg-white/60 shadow-soft lg:block" />
               <div className="relative h-full w-full overflow-hidden rounded-full border-[6px] border-pearl shadow-[0_25px_45px_rgba(237,122,19,0.35)]">
                 <img
@@ -105,17 +104,17 @@ export default function Home() {
           </section>
 
           <section className="grid gap-16 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-            <div className="space-y-5 lg:max-w-3xl">
+            <div className="space-y-5 text-center sm:text-left lg:max-w-3xl">
               <span className="inline-flex w-max items-center gap-2 rounded-full bg-accent/20 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-accent">
                 — Chi siamo
               </span>
               <h2 className="text-3xl font-semibold text-text sm:text-4xl">Il burger bar dal mood brooklynese</h2>
-              <p className="text-sm text-text/70 sm:text-base">
+              <p className="mx-auto max-w-xl text-sm text-text/70 sm:mx-0 sm:text-base">
                 Siamo un team di chef e bartender che ama sperimentare. Prepariamo pane brioche in laboratorio,
                 affumichiamo le carni in casa e firmiamo ogni burger con salse studiate per esaltare gli ingredienti.
                 Ogni ordine viene rifinito espesso davanti a te.
               </p>
-              <ul className="space-y-3 text-sm text-text/80 sm:text-base">
+              <ul className="mx-auto max-w-xl space-y-3 text-left text-sm text-text/80 sm:mx-0 sm:text-base">
                 {aboutHighlights.map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <span aria-hidden="true" className="mt-[2px] text-accent">
@@ -125,13 +124,13 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button asChild className="mt-4 w-max">
+              <Button asChild className="mt-4 w-max mx-auto sm:mx-0">
                 <Link href="/menu">Scopri il menù completo</Link>
               </Button>
             </div>
             <div className="relative flex items-center justify-center">
               <span className="absolute -bottom-10 -left-6 hidden h-36 w-36 rounded-full bg-primary/20 blur-xl lg:block" />
-              <div className="relative z-[1] overflow-hidden rounded-[28px] border-[6px] border-pearl shadow-[0_25px_45px_rgba(106,128,66,0.35)]">
+              <div className="relative z-[1] w-full max-w-[280px] overflow-hidden rounded-[28px] border-[6px] border-pearl shadow-[0_25px_45px_rgba(106,128,66,0.35)] sm:max-w-xs lg:max-w-md">
                 <img
                   src="/hamburger-2.jpg"
                   alt="Chef al lavoro in cucina"
@@ -147,8 +146,8 @@ export default function Home() {
           </section>
 
           <section className="space-y-10">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
+            <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
+              <div className="space-y-2">
                 <span className="inline-flex w-max items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
                   — Best seller
                 </span>
@@ -159,7 +158,7 @@ export default function Home() {
               </div>
               <Link
                 href="/menu"
-                className="text-sm font-semibold text-primary transition hover:text-primary/80"
+                className="text-sm font-semibold text-primary transition hover:text-primary/80 sm:self-end"
               >
                 Vedi tutto →
               </Link>
@@ -169,9 +168,9 @@ export default function Home() {
                 return (
                   <article
                     key={product.id}
-                    className="flex items-start gap-6 sm:gap-8"
+                    className="flex flex-col gap-5 rounded-[28px] border border-primary/10 bg-pearl/80 p-5 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:gap-8 sm:p-6"
                   >
-                    <div className="relative h-40 w-40 flex-shrink-0 overflow-hidden rounded-[28px] sm:h-48 sm:w-48">
+                    <div className="relative h-48 w-full overflow-hidden rounded-[24px] sm:h-40 sm:w-40 sm:flex-shrink-0 sm:rounded-[28px]">
                       <img
                         src={`${product.image}?auto=format&fit=crop&w=800&q=80`}
                         alt={product.name}
@@ -183,7 +182,7 @@ export default function Home() {
                         </span>
                       ) : null}
                     </div>
-                    <div className="flex flex-1 flex-col gap-3">
+                    <div className="flex flex-1 flex-col gap-3 text-center sm:text-left">
                       <h3 className="text-xl font-semibold text-text sm:text-2xl">{product.name}</h3>
                       <p className="text-sm text-text/70 sm:text-base">{product.description}</p>
                     </div>
@@ -194,20 +193,20 @@ export default function Home() {
           </section>
 
           <section className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-            <div className="space-y-4 lg:max-w-2xl">
+            <div className="space-y-4 text-center sm:text-left lg:max-w-2xl">
               <span className="inline-flex w-max items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
                 — Perché sceglierci
               </span>
               <h2 className="text-3xl font-semibold text-text sm:text-4xl">Qualità da mordere</h2>
-              <p className="text-sm text-text/70 sm:text-base">
+              <p className="mx-auto max-w-xl text-sm text-text/70 sm:mx-0 sm:text-base">
                 Dietro ogni burger c&apos;è un processo studiato. Dalla selezione dei fornitori alle marinature a lunga cottura, tutto è pensato per darti il massimo del gusto in ogni morso.
               </p>
             </div>
-            <div className="grid gap-5 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {whyChoose.map((feature) => (
                 <div
                   key={feature.title}
-                  className="flex h-full flex-col gap-3 rounded-[24px] border border-primary/15 bg-pearl/80 p-5 shadow-sm backdrop-blur-sm"
+                  className="flex h-full flex-col items-center gap-3 rounded-[24px] border border-primary/15 bg-pearl/80 p-5 text-center shadow-sm backdrop-blur-sm sm:items-start sm:text-left"
                 >
                   <span aria-hidden="true" className="text-2xl">
                     {feature.icon}
@@ -220,18 +219,18 @@ export default function Home() {
           </section>
 
           <section className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-center">
-            <div className="order-2 space-y-6 lg:order-1 lg:max-w-2xl">
+            <div className="order-2 space-y-6 text-center sm:text-left lg:order-1 lg:max-w-2xl">
               <span className="inline-flex w-max items-center gap-2 rounded-full bg-accent/20 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-accent">
                 — Cosa dicono di noi
               </span>
-              <blockquote className="text-lg font-medium text-text sm:text-xl">
+              <blockquote className="mx-auto text-lg font-medium text-text sm:mx-0 sm:text-xl">
                 {testimonial.quote}
               </blockquote>
               <div>
                 <p className="text-sm font-semibold text-text">{testimonial.name}</p>
                 <p className="text-xs uppercase tracking-widest text-text/60">{testimonial.role}</p>
               </div>
-              <div className="flex gap-4">
+              <div className="flex justify-center gap-4 sm:justify-start">
                 <span aria-label="Valutazione 5 su 5" className="text-accent">
                   ★★★★★
                 </span>
@@ -239,7 +238,7 @@ export default function Home() {
               </div>
             </div>
             <div className="order-1 lg:order-2">
-              <div className="relative overflow-hidden rounded-[28px] border-[6px] border-pearl shadow-[0_25px_45px_rgba(237,122,19,0.25)]">
+              <div className="relative mx-auto max-w-[320px] overflow-hidden rounded-[28px] border-[6px] border-pearl shadow-[0_25px_45px_rgba(237,122,19,0.25)] sm:max-w-full">
                 <img
                   src="https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=900&q=80"
                   alt="Clienti felici nel locale"
@@ -276,15 +275,15 @@ export default function Home() {
           </section>
 
           <section className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-            <div className="space-y-5">
+            <div className="space-y-5 text-center sm:text-left">
               <span className="inline-flex w-max items-center gap-2 rounded-full bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
                 — Vieni a trovarci
               </span>
               <h2 className="text-3xl font-semibold text-text sm:text-4xl">Ti aspettiamo a {restaurantInfo.address.split(',')[0]}</h2>
-              <p className="text-sm text-text/70 sm:text-base">
+              <p className="mx-auto max-w-xl text-sm text-text/70 sm:mx-0 sm:text-base">
                 Siamo aperti tutti i giorni con cucina sempre attiva. Prenota con una chiamata o raggiungici: ti accoglieremo con il profumo di burger appena piastrati.
               </p>
-              <dl className="grid gap-4 text-sm sm:grid-cols-2">
+              <dl className="grid gap-4 text-left text-sm sm:grid-cols-2">
                 <div>
                   <dt className="font-semibold text-text">Indirizzo</dt>
                   <dd className="mt-1 text-text/70">{restaurantInfo.address}</dd>
@@ -306,7 +305,7 @@ export default function Home() {
                   </dd>
                 </div>
               </dl>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
                 <Button asChild className="gap-2">
                   <Link href={`tel:${restaurantInfo.phone.replace(/\s+/g, '')}`}>
                     <img src="/phone.png" width={32} alt="" /> Chiama
@@ -319,7 +318,7 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <div className="overflow-hidden rounded-[28px] border border-black/5 bg-pearl/80 shadow-inner">
+            <div className="mx-auto w-full max-w-[420px] overflow-hidden rounded-[28px] border border-black/5 bg-pearl/80 shadow-inner sm:max-w-full">
               <iframe
                 title="GreenBurger su Google Maps"
                 src={mapsEmbedUrl}

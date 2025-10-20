@@ -34,6 +34,9 @@ export default function MenuPage() {
   const [query, setQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>();
   const [isModalOpen, setModalOpen] = useState(false);
+  const dealSliderRef = useRef<HTMLDivElement | null>(null);
+  const [dealCanScrollPrev, setDealCanScrollPrev] = useState(false);
+  const [dealCanScrollNext, setDealCanScrollNext] = useState(false);
 
   const sectionRefs = useRef<SectionRefMap>({});
 
@@ -57,6 +60,12 @@ export default function MenuPage() {
       return flagged;
     }
     return products.slice(0, 6);
+  }, [products]);
+
+  const dealProducts = useMemo(() => {
+    return products
+      .filter((product) => Boolean(product.promoPrice))
+      .slice(0, 3);
   }, [products]);
 
   const matchesQuery = useCallback(
@@ -101,6 +110,33 @@ export default function MenuPage() {
       });
     },
     [add, toast]
+  );
+
+  const updateDealNav = useCallback(() => {
+    const container = dealSliderRef.current;
+    if (!container) {
+      setDealCanScrollPrev(false);
+      setDealCanScrollNext(false);
+      return;
+    }
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setDealCanScrollPrev(scrollLeft > 8);
+    setDealCanScrollNext(scrollLeft + clientWidth < scrollWidth - 8);
+  }, []);
+
+  const scrollDeals = useCallback(
+    (direction: 'prev' | 'next') => {
+      const container = dealSliderRef.current;
+      if (!container) {
+        return;
+      }
+      const distance = direction === 'next' ? container.clientWidth : -container.clientWidth;
+      container.scrollBy({ left: distance, behavior: 'smooth' });
+      if (typeof window !== 'undefined') {
+        window.setTimeout(updateDealNav, 360);
+      }
+    },
+    [updateDealNav]
   );
 
   const handleCategoryClick = useCallback((slug: string) => {
@@ -170,6 +206,31 @@ export default function MenuPage() {
     };
   }, []);
 
+  useEffect(() => {
+    const container = dealSliderRef.current;
+    if (typeof window === 'undefined' || !container) {
+      return;
+    }
+
+    updateDealNav();
+
+    const handleResize = () => {
+      updateDealNav();
+    };
+
+    container.addEventListener('scroll', updateDealNav, { passive: true });
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      container.removeEventListener('scroll', updateDealNav);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [updateDealNav, dealProducts.length]);
+
+  useEffect(() => {
+    updateDealNav();
+  }, [updateDealNav, dealProducts.length]);
+
   const todayIndex = useMemo(() => {
     const now = new Date();
     return (now.getDay() + 6) % 7;
@@ -213,7 +274,7 @@ export default function MenuPage() {
           <h2 className="text-2xl font-semibold text-text">{category.name}</h2>
           <span className="text-sm text-text/50">{categoryProducts.length} prodotti</span>
         </div>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {categoryProducts.map((product) => (
             <ProductCard
               key={product.id}
@@ -266,118 +327,67 @@ export default function MenuPage() {
 
       <div className="hidden lg:block">
         <div className="mx-auto max-w-7xl px-4">
-          <div className="mb-6 rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
-                    GB
-                  </div>
-                  <div>
-                    <p className="text-lg font-semibold text-text">GreenBurger</p>
-                    <p className="text-sm text-text/60">{restaurantInfo.address}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-text/70">
-                  <span className="flex items-center gap-1 text-primary">
-                    <span aria-hidden="true">⭐️</span>
-                    {ratingValue}
-                  </span>
-                  <span>{ratingLabel}</span>
-                </div>
-                {todayHours ? (
-                  <p className="text-sm text-text/70">
-                    Oggi: {todayHours.open} - {todayHours.close}
-                  </p>
-                ) : null}
-              </div>
-              <div className="flex flex-col gap-3 sm:max-w-xs lg:ml-auto lg:w-64">
-                <Button asChild fullWidth className="gap-2">
-                  <Link href={phoneHref}>
-                    <span aria-hidden="true">📞</span> Chiama
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  fullWidth
-                  variant="secondary"
-                  className="gap-2"
-                >
-                  <Link
-                    href={restaurantInfo.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span aria-hidden="true">🗺️</span> Indicazioni
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-[280px_minmax(0,1fr)_320px] gap-6 pb-12">
-            <aside className="sticky top-[5.5rem] h-max space-y-4">
-              <div className="rounded-3xl  p-6  shadow-emerald-100/40">
-                <div className="flex flex-col gap-1">
-                  {menuCategories.map((category) => {
-                    const isActive = activeCategory === category.slug;
-                    return (
+          <div className="grid grid-cols-[minmax(0,1fr)_320px] gap-8 pb-6">
+            <div className="space-y-12">
+              <div className="sticky top-[4.5rem] z-20 bg-transparent pb-2 pt-2">
+                <div className="rounded-3xl border border-white/60 bg-white/95 p-5 shadow-soft backdrop-blur">
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg">
+                      🔍
+                    </span>
+                    <input
+                      type="search"
+                      value={query}
+                      onChange={(event) => handleSearchChange(event.target.value)}
+                      placeholder="Cerca nel menù..."
+                      className="w-full rounded-2xl border border-black/5 bg-white px-12 py-3 text-sm text-text placeholder:text-text/50 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30"
+                      autoComplete="off"
+                    />
+                    {query ? (
                       <button
-                        key={category.slug}
-                        onClick={() => handleCategoryClick(category.slug)}
-                        className={cn(
-                          'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
-                          isActive
-                            ? 'bg-primary/15 text-primary'
-                            : 'text-text/60 hover:text-text'
-                        )}
+                        type="button"
+                        onClick={() => handleSearchChange('')}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-text/5 px-2 py-1 text-xs font-semibold text-text/60 transition hover:bg-text/10"
+                        aria-label="Cancella ricerca"
                       >
-                        {category.image ? (
-                          <span className="relative h-8 w-8 overflow-hidden">
-                            <Image
-                              src={category.image}
-                              alt={category.name}
-                              width={32}
-                              height={32}
-                              className="h-full w-full object-contain"
-                            />
-                          </span>
-                        ) : (
-                          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-xs text-primary">
-                            ★
-                          </span>
-                        )}
-                        <span>{category.name}</span>
+                        ✕
                       </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </aside>
-
-            <div className="space-y-10">
-              <div className="sticky top-[4.5rem] z-20 bg-background/95 pb-4 pt-2 backdrop-blur">
-                <div className="relative">
-                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg">
-                    🔍
-                  </span>
-                  <input
-                    type="search"
-                    value={query}
-                    onChange={(event) => handleSearchChange(event.target.value)}
-                    placeholder="Cerca nel menù..."
-                    className="w-full rounded-2xl border border-black/5 bg-white px-12 py-3 text-sm text-text placeholder:text-text/50 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30"
-                    autoComplete="off"
-                  />
-                  {query ? (
-                    <button
-                      type="button"
-                      onClick={() => handleSearchChange('')}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-text/5 px-2 py-1 text-xs font-semibold text-text/60 transition hover:bg-text/10"
-                      aria-label="Cancella ricerca"
-                    >
-                      ✕
-                    </button>
-                  ) : null}
+                    ) : null}
+                  </div>
+                  <div className="mt-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                    {menuCategories.map((category) => {
+                      const isActive = activeCategory === category.slug;
+                      return (
+                        <button
+                          key={category.slug}
+                          onClick={() => handleCategoryClick(category.slug)}
+                          className={cn(
+                            'group flex min-w-[100px] flex-col items-center gap-3 rounded-2xl border border-transparent bg-transparent px-3 py-2 text-xs font-semibold text-text/70 transition-all duration-300',
+                            isActive
+                              ? 'border-primary/40 text-primary'
+                              : 'hover:border-primary/20 hover:text-text'
+                          )}
+                        >
+                          {category.image ? (
+                            <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden">
+                              <Image
+                                src={category.image}
+                                alt={category.name}
+                                width={48}
+                                height={48}
+                                className="object-contain transition-transform duration-300 group-hover:scale-105"
+                              />
+                            </span>
+                          ) : (
+                            <span className="flex h-16 w-16 items-center justify-center text-2xl text-primary">
+                              ★
+                            </span>
+                          )}
+                          <span className="text-center text-sm">{category.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -390,10 +400,177 @@ export default function MenuPage() {
                   Nessun prodotto corrisponde alla ricerca. Prova a cambiare termini o categoria.
                 </div>
               )}
+
+              {dealProducts.length ? (
+                <section className="space-y-5 rounded-3xl border border-white/60 bg-white/95 p-6 shadow-soft backdrop-blur">
+                  <header className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">
+                        Special Deals
+                      </p>
+                      <h2 className="text-2xl font-semibold text-text">Combo da non perdere</h2>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-text/50">
+                      <button
+                        type="button"
+                        className={cn(
+                          'flex h-10 w-10 items-center justify-center rounded-full border text-lg transition',
+                          dealCanScrollPrev
+                            ? 'border-text/10 text-text/60 hover:border-primary/40 hover:text-primary'
+                            : 'border-text/5 text-text/30 cursor-not-allowed'
+                        )}
+                        onClick={() => scrollDeals('prev')}
+                        aria-label="Mostra offerte precedenti"
+                        disabled={!dealCanScrollPrev}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        className={cn(
+                          'flex h-10 w-10 items-center justify-center rounded-full border text-lg transition',
+                          dealCanScrollNext
+                            ? 'border-text/10 text-text/60 hover:border-primary/40 hover:text-primary'
+                            : 'border-text/5 text-text/30 cursor-not-allowed'
+                        )}
+                        onClick={() => scrollDeals('next')}
+                        aria-label="Mostra offerte successive"
+                        disabled={!dealCanScrollNext}
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </header>
+                  <div className="relative">
+                    <div
+                      ref={dealSliderRef}
+                      className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-3 no-scrollbar"
+                    >
+                      {dealProducts.map((product) => {
+                        const finalPrice = product.promoPrice ?? product.price;
+                        return (
+                          <div
+                            key={product.id}
+                            className="flex w-full flex-shrink-0 snap-start md:flex-[0_0_calc(50%-12px)] xl:flex-[0_0_520px]"
+                          >
+                            <article
+                              className="group flex h-full min-h-[280px] w-full flex-col overflow-hidden rounded-[32px] border border-primary/10 bg-white text-left shadow-soft transition hover:-translate-y-1 hover:shadow-lg md:flex-row"
+                              onClick={() => {
+                                setSelectedProduct(product);
+                                setModalOpen(true);
+                              }}
+                            >
+                              <div className="relative order-first h-48 w-full overflow-hidden bg-pearl/80 shadow-inner md:order-last md:h-auto md:min-h-[240px] md:w-72">
+                                <Image
+                                  src={`${product.image}?auto=format&fit=crop&w=560&q=80`}
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover transition duration-300 group-hover:scale-105"
+                                  sizes="(min-width: 1280px) 18rem, (min-width: 1024px) 16rem, 100vw"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent" />
+                              </div>
+                              <div className="order-last flex h-full min-w-0 flex-1 flex-col gap-5 p-6 md:order-first md:p-8">
+                                <div className="flex flex-col gap-3">
+                                  <div className="flex flex-wrap items-center gap-3 text-text">
+                                    <h3 className="text-xl font-semibold text-text">{product.name}</h3>
+                                    {product.badges?.length ? (
+                                      <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                                        {product.badges[0]}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                  <p className="max-w-xl text-sm text-text/70">{product.description}</p>
+                                  <div className="flex flex-col gap-1">
+                                    {product.promoPrice ? (
+                                      <span className="text-xs uppercase tracking-wide text-text/40 line-through">
+                                        {formatCurrency(product.price)}
+                                      </span>
+                                    ) : null}
+                                    <span className="text-2xl font-semibold text-primary">
+                                      {formatCurrency(finalPrice)}
+                                    </span>
+                                    {product.promoPrice ? (
+                                      <span className="text-xs font-semibold uppercase tracking-[0.3em] text-accent">
+                                        Risparmi {formatCurrency(product.price - finalPrice)}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                </div>
+                                <div className="mt-auto flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                                  <div className="hidden sm:block" />
+                                  <Button
+                                    className="w-full rounded-full px-6 py-2 text-sm sm:w-auto"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      handleAdd(product);
+                                    }}
+                                  >
+                                    Ordina ora
+                                  </Button>
+                                </div>
+                              </div>
+                            </article>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-12 bg-gradient-to-r from-white via-white/70 to-transparent md:block" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-12 bg-gradient-to-l from-white via-white/70 to-transparent md:block" />
+                  </div>
+                </section>
+              ) : null}
             </div>
 
-            <aside className="sticky top-[5.5rem] h-max space-y-4">
-              <div className="rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
+            <aside className="sticky top-[5.5rem] h-max">
+              <div className="space-y-4">
+                <div className="rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
+                        GB
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-text">GreenBurger</p>
+                        <p className="text-sm text-text/60">{restaurantInfo.address}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-text/70">
+                      <span className="flex items-center gap-1 text-primary">
+                        <span aria-hidden="true">⭐️</span>
+                        {ratingValue}
+                      </span>
+                      <span>{ratingLabel}</span>
+                    </div>
+                    {todayHours ? (
+                      <p className="text-sm text-text/70">
+                        Oggi: {todayHours.open} - {todayHours.close}
+                      </p>
+                    ) : null}
+                    <div className="flex flex-col gap-3">
+                      <Button asChild fullWidth className="gap-2">
+                        <Link href={phoneHref}>
+                          <span aria-hidden="true">📞</span> Chiama
+                        </Link>
+                      </Button>
+                      <Button
+                        asChild
+                        fullWidth
+                        variant="secondary"
+                        className="gap-2"
+                      >
+                        <Link
+                          href={restaurantInfo.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <span aria-hidden="true">🗺️</span> Indicazioni
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-3xl bg-white p-6 shadow-md shadow-emerald-100/40">
                 <h2 className="text-xl font-semibold text-text">Il tuo carrello</h2>
                 {items.length === 0 ? (
                   <div className="mt-4 rounded-2xl border border-dashed border-gray-200 bg-background px-4 py-8 text-center text-sm text-text/60">
@@ -473,6 +650,7 @@ export default function MenuPage() {
                     </Button>
                   </>
                 )}
+              </div>
               </div>
             </aside>
           </div>

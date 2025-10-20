@@ -42,11 +42,13 @@ export const ProductCard = ({ product, onAdd, onOpen }: ProductCardProps) => {
           <p className="mt-1 text-sm text-text/70 line-clamp-2">{product.description}</p>
         </div>
         <div className="mt-auto flex items-center justify-between">
-          <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-text">{formatCurrency(finalPrice)}</span>
+          <div className="flex flex-col items-start gap-1">
             {product.promoPrice ? (
-              <span className="text-sm text-text/50 line-through">{formatCurrency(product.price)}</span>
+              <span className="text-xs uppercase tracking-wide text-text/40 line-through">
+                {formatCurrency(product.price)}
+              </span>
             ) : null}
+            <span className="text-lg font-bold text-text">{formatCurrency(finalPrice)}</span>
           </div>
           <Button
             variant="primary"
