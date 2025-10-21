@@ -293,12 +293,16 @@ const MenuTab = () => {
                           </p>
                         </div>
                         <div className="flex gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
+                          <Button
+                            variant="ghost"
+                            className="px-3 py-1.5 text-xs"
+                            onClick={() => handleEdit(item)}
+                          >
                             Modifica
                           </Button>
                           <Button
                             variant="ghost"
-                            size="sm"
+                            className="px-3 py-1.5 text-xs"
                             onClick={() => handleDelete(item.id)}
                           >
                             Elimina
