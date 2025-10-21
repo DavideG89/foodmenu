@@ -13,6 +13,7 @@ export type Product = {
   image: string;
   categorySlug: string;
   badges?: string[];
+  available?: boolean;
 };
 
 export type Offer = {
@@ -46,7 +47,8 @@ export const products: Product[] = [
     promoPrice: 8.5,
     image: '/hamburger-1.jpg',
     categorySlug: 'burgers',
-    badges: ['-20%']
+    badges: ['-20%'],
+    available: true
   },
   {
     id: 'burger-02',
@@ -55,7 +57,8 @@ export const products: Product[] = [
     price: 13.9,
     image: '/hamburger-2.jpg',
     categorySlug: 'burgers',
-    badges: ['Novità']
+    badges: ['Novità'],
+    available: true
   },
   {
     id: 'fries-01',
@@ -63,7 +66,8 @@ export const products: Product[] = [
     description: 'Patate taglio rustico doppia cottura con sale alle erbe.',
     price: 4.5,
     image: '/fries1.jpg',
-    categorySlug: 'sides'
+    categorySlug: 'sides',
+    available: true
   },
   {
     id: 'fries-02',
@@ -72,7 +76,8 @@ export const products: Product[] = [
     price: 6.5,
     image: '/fries2.png',
     categorySlug: 'sides',
-    badges: ['Best seller']
+    badges: ['Best seller'],
+    available: true
   },
   {
     id: 'drink-01',
@@ -80,7 +85,8 @@ export const products: Product[] = [
     description: 'La classica cola servita fredda con ghiaccio.',
     price: 3.0,
     image: '/coca.jpg',
-    categorySlug: 'drinks'
+    categorySlug: 'drinks',
+    available: true
   },
   {
     id: 'drink-02',
@@ -88,7 +94,8 @@ export const products: Product[] = [
     description: 'Bevanda frizzante agli agrumi, perfetta per accompagnare i burger.',
     price: 3.0,
     image: '/fanta.jpeg',
-    categorySlug: 'drinks'
+    categorySlug: 'drinks',
+    available: true
   },
   {
     id: 'drink-03',
@@ -96,7 +103,8 @@ export const products: Product[] = [
     description: 'Bottiglietta di acqua naturale da 50cl.',
     price: 1.5,
     image: '/water.webp',
-    categorySlug: 'drinks'
+    categorySlug: 'drinks',
+    available: true
   },
   {
     id: 'side-01',
@@ -104,7 +112,8 @@ export const products: Product[] = [
     description: 'Insalata di cavolo croccante, carote e salsa yogurt.',
     price: 3.2,
     image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd',
-    categorySlug: 'sides'
+    categorySlug: 'sides',
+    available: true
   },
   {
     id: 'side-02',
@@ -114,7 +123,8 @@ export const products: Product[] = [
     promoPrice: 5.5,
     image: '/chicken-wings.jpg',
     categorySlug: 'sides',
-    badges: ['-20%']
+    badges: ['-20%'],
+    available: true
   },
   {
     id: 'special-01',
@@ -124,7 +134,8 @@ export const products: Product[] = [
     promoPrice: 16.0,
     image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90',
     categorySlug: 'specials',
-    badges: ['Combo']
+    badges: ['Combo'],
+    available: true
   }
 ];
 

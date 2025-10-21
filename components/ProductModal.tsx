@@ -40,6 +40,7 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
     const price = product.promoPrice ?? product.price;
     return price * quantity;
   }, [product, quantity]);
+  const isAvailable = product?.available !== false;
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -94,6 +95,11 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
                         <span className="text-sm text-text/50 line-through">{formatCurrency(product.price)}</span>
                       ) : null}
                     </div>
+                    {isAvailable ? null : (
+                      <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-accent">
+                        Non disponibile per il pickup
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <button
@@ -101,6 +107,7 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
                         'flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-lg font-bold text-text'
                       )}
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      disabled={!isAvailable}
                       aria-label="Diminuisci"
                     >
                       −
@@ -111,6 +118,7 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
                         'flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-lg font-bold text-text'
                       )}
                       onClick={() => setQuantity((q) => q + 1)}
+                      disabled={!isAvailable}
                       aria-label="Aumenta"
                     >
                       +
@@ -125,12 +133,13 @@ export const ProductModal = ({ product, open, onOpenChange, onAdd }: ProductModa
                 </div>
                 <Button
                   fullWidth
+                  disabled={!isAvailable}
                   onClick={() => {
-                    if (!product) return;
+                    if (!product || !isAvailable) return;
                     onAdd(product, quantity);
                   }}
                 >
-                  Aggiungi al carrello
+                  {isAvailable ? 'Aggiungi al carrello' : 'Non disponibile'}
                 </Button>
               </div>
             </>

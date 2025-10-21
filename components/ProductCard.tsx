@@ -13,19 +13,20 @@ export type ProductCardProps = {
 
 export const ProductCard = ({ product, onAdd, onOpen }: ProductCardProps) => {
   const finalPrice = product.promoPrice ?? product.price;
+  const isAvailable = product.available !== false;
 
   return (
     <article
-      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-soft transition-transform duration-300 ease-out hover:-translate-y-1"
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-soft transition-transform duration-300 ease-out hover:-translate-y-1 sm:flex-row"
       onClick={() => onOpen(product)}
     >
-      <div className="relative aspect-video w-full overflow-hidden">
+      <div className="relative aspect-[4/3] w-full overflow-hidden sm:h-full sm:w-48 sm:flex-shrink-0 sm:aspect-auto">
         <Image
           src={`${product.image}?auto=format&fit=crop&w=800&q=80`}
           alt={product.name}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 33vw"
+          sizes="(max-width: 640px) 100vw, 25vw"
         />
         {product.badges?.map((badge) => (
           <span
@@ -36,12 +37,12 @@ export const ProductCard = ({ product, onAdd, onOpen }: ProductCardProps) => {
           </span>
         ))}
       </div>
-      <div className="flex flex-1 flex-col gap-3 px-4 py-4">
+      <div className="flex h-full flex-1 flex-col gap-3 px-4 py-4 sm:px-6 sm:py-6">
         <div>
           <h3 className="text-lg font-semibold text-text">{product.name}</h3>
-          <p className="mt-1 text-sm text-text/70 line-clamp-2">{product.description}</p>
+          <p className="mt-1 text-sm text-text/70 line-clamp-2 sm:line-clamp-3">{product.description}</p>
         </div>
-        <div className="mt-auto flex items-center justify-between">
+        <div className="mt-auto flex items-center justify-between gap-4">
           <div className="flex flex-col items-start gap-1">
             {product.promoPrice ? (
               <span className="text-xs uppercase tracking-wide text-text/40 line-through">
@@ -52,13 +53,16 @@ export const ProductCard = ({ product, onAdd, onOpen }: ProductCardProps) => {
           </div>
           <Button
             variant="primary"
+            disabled={!isAvailable}
             onClick={(event) => {
               event.stopPropagation();
-              onAdd(product);
+              if (isAvailable) {
+                onAdd(product);
+              }
             }}
-            className="rounded-full px-3 py-2 text-sm"
+            className="rounded-full px-4 py-2 text-sm"
           >
-            + Aggiungi
+            {isAvailable ? '+ Aggiungi' : 'Esaurito'}
           </Button>
         </div>
       </div>

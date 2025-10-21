@@ -1,8 +1,9 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import type { Product } from '@/data/mockData';
+import { createPersistStorage } from '@/lib/store/storage';
 
 type CartItem = {
   product: Product;
@@ -20,33 +21,7 @@ type CartState = {
   subtotal: () => number;
 };
 
-const createMemoryStorage = (): Storage => {
-  let store: Record<string, string> = {};
-
-  return {
-    getItem: (name: string) => (name in store ? store[name] : null),
-    setItem: (name: string, value: string) => {
-      store[name] = value;
-    },
-    removeItem: (name: string) => {
-      delete store[name];
-    },
-    clear: () => {
-      store = {};
-    },
-    key: (index: number) => Object.keys(store)[index] ?? null,
-    get length() {
-      return Object.keys(store).length;
-    }
-  };
-};
-
-const storage = createJSONStorage(() => {
-  if (typeof window === 'undefined') {
-    return createMemoryStorage();
-  }
-  return window.localStorage;
-});
+const storage = createPersistStorage('local');
 
 export const useCartStore = create<CartState>()(
   persist(

@@ -199,7 +199,7 @@ export default function CartPage() {
             Svuota
           </Button>
           <Button asChild className="flex-1">
-            <Link href="/cart/success">Conferma ordine (contanti)</Link>
+            <Link href="/checkout">Vai al checkout</Link>
           </Button>
         </div>
       </div>

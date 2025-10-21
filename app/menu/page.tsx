@@ -3,14 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  categories,
-  products,
-  restaurantInfo,
-  offers,
-  type Product,
-  type Category
-} from '@/data/mockData';
+import { restaurantInfo, offers, type Product, type Category } from '@/data/mockData';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductModal } from '@/components/ProductModal';
@@ -22,15 +15,26 @@ import { cn } from '@/lib/utils';
 
 type SectionRefMap = Record<string, HTMLElement | null>;
 
+type MenuResponse = {
+  categories: Category[];
+  items: Product[];
+};
+
 const ratingValue = '4.8';
 const ratingLabel = '120+ recensioni';
 
 export default function MenuPage() {
-  const menuCategories = useMemo<Category[]>(
-    () => [{ name: 'I più venduti', slug: 'best-sellers', image: '/Piuvenduti.png' }, ...categories],
-    [categories]
-  );
-  const [activeCategory, setActiveCategory] = useState(menuCategories[0]?.slug ?? '');
+  const [menuData, setMenuData] = useState<MenuResponse | null>(null);
+  const [isMenuLoading, setMenuLoading] = useState(true);
+  const [menuError, setMenuError] = useState<string | null>(null);
+  const menuCategories = useMemo<Category[]>(() => {
+    const baseCategories = menuData?.categories ?? [];
+    if (!baseCategories.length) {
+      return [];
+    }
+    return [{ name: 'I più venduti', slug: 'best-sellers', image: '/Piuvenduti.png' }, ...baseCategories];
+  }, [menuData]);
+  const [activeCategory, setActiveCategory] = useState('');
   const [query, setQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>();
   const [isModalOpen, setModalOpen] = useState(false);
@@ -50,23 +54,70 @@ export default function MenuPage() {
   const { toast } = useToast();
   const promo = offers[0];
 
+  const loadMenu = useCallback(async () => {
+    try {
+      setMenuLoading(true);
+      setMenuError(null);
+      const response = await fetch('/api/menu');
+      if (!response.ok) {
+        throw new Error('Impossibile caricare il menù');
+      }
+      const data = (await response.json()) as MenuResponse;
+      setMenuData(data);
+    } catch (error) {
+      console.error(error);
+      const message = error instanceof Error ? error.message : 'Errore inatteso';
+      setMenuError(message);
+      toast({
+        title: 'Errore caricamento menù',
+        description: message,
+        duration: 4000
+      });
+    } finally {
+      setMenuLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    loadMenu();
+  }, [loadMenu]);
+
+  useEffect(() => {
+    if (!menuCategories.length) {
+      return;
+    }
+    setActiveCategory((current) => {
+      if (!current || !menuCategories.some((category) => category.slug === current)) {
+        return menuCategories[0].slug;
+      }
+      return current;
+    });
+  }, [menuCategories]);
+
+  const availableItems = useMemo(
+    () => (menuData?.items ?? []).filter((item) => item.available !== false),
+    [menuData?.items]
+  );
+  const hasAnyProduct = availableItems.length > 0;
+
   const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
 
   const bestSellerProducts = useMemo(() => {
-    const flagged = products.filter((product) =>
+    if (!availableItems.length) {
+      return [];
+    }
+    const flagged = availableItems.filter((product) =>
       product.badges?.some((badge) => badge.toLowerCase().includes('best'))
     );
     if (flagged.length > 0) {
       return flagged;
     }
-    return products.slice(0, 6);
-  }, [products]);
+    return availableItems.slice(0, 6);
+  }, [availableItems]);
 
   const dealProducts = useMemo(() => {
-    return products
-      .filter((product) => Boolean(product.promoPrice))
-      .slice(0, 3);
-  }, [products]);
+    return availableItems.filter((product) => Boolean(product.promoPrice)).slice(0, 3);
+  }, [availableItems]);
 
   const matchesQuery = useCallback(
     (product: Product) => {
@@ -82,14 +133,14 @@ export default function MenuPage() {
   );
 
   const productsByCategory = useMemo(() => {
-    return categories.reduce<Record<string, Product[]>>(
-      (acc, category) => {
-        acc[category.slug] = products.filter((product) => product.categorySlug === category.slug);
-        return acc;
-      },
-      { 'best-sellers': bestSellerProducts }
-    );
-  }, [categories, products, bestSellerProducts]);
+    const map: Record<string, Product[]> = { 'best-sellers': bestSellerProducts };
+    (menuData?.categories ?? []).forEach((category) => {
+      map[category.slug] = availableItems.filter(
+        (product) => product.categorySlug === category.slug
+      );
+    });
+    return map;
+  }, [menuData, availableItems, bestSellerProducts]);
 
   const filteredProducts = useMemo(() => {
     const byCategory = productsByCategory[activeCategory] ?? [];
@@ -102,6 +153,14 @@ export default function MenuPage() {
 
   const handleAdd = useCallback(
     (product: Product, quantity = 1) => {
+      if (product.available === false) {
+        toast({
+          title: 'Non disponibile',
+          description: 'Questo piatto non è al momento disponibile.',
+          duration: 3000
+        });
+        return;
+      }
       add(product, quantity);
       toast({
         title: 'Aggiunto al carrello',
@@ -204,7 +263,7 @@ export default function MenuPage() {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [menuCategories, productsByCategory]);
 
   useEffect(() => {
     const container = dealSliderRef.current;
@@ -274,7 +333,7 @@ export default function MenuPage() {
           <h2 className="text-2xl font-semibold text-text">{category.name}</h2>
           <span className="text-sm text-text/50">{categoryProducts.length} prodotti</span>
         </div>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5">
           {categoryProducts.map((product) => (
             <ProductCard
               key={product.id}
@@ -293,6 +352,26 @@ export default function MenuPage() {
 
   const hasDesktopResults = desktopSections.some(Boolean);
 
+  if (isMenuLoading) {
+    return (
+      <div className="flex flex-1 items-center justify-center text-sm text-text/60">
+        Caricamento del menù…
+      </div>
+    );
+  }
+
+  if (menuError) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center text-text">
+        <div className="space-y-1">
+          <p className="text-lg font-semibold">Impossibile caricare il menù</p>
+          <p className="text-sm text-text/60">{menuError}</p>
+        </div>
+        <Button onClick={loadMenu}>Riprova</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 lg:space-y-10">
       <div className="lg:hidden space-y-6">
@@ -307,7 +386,9 @@ export default function MenuPage() {
         <div className="grid grid-cols-1 gap-5 pb-8">
           {filteredProducts.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-gray-200 bg-white/80 px-4 py-8 text-center text-sm text-text/60">
-              Nessun prodotto trovato. Prova a cercare un altro piatto.
+              {normalizedQuery
+                ? 'Nessun prodotto trovato. Prova a cercare un altro piatto.'
+                : 'Il menù è in aggiornamento. Torna più tardi per nuove proposte.'}
             </div>
           ) : (
             filteredProducts.map((product) => (
@@ -362,19 +443,19 @@ export default function MenuPage() {
                           key={category.slug}
                           onClick={() => handleCategoryClick(category.slug)}
                           className={cn(
-                            'group flex min-w-[100px] flex-col items-center gap-3 rounded-2xl border border-transparent bg-transparent px-3 py-2 text-xs font-semibold text-text/70 transition-all duration-300',
+                            'group flex min-w-[100px] flex-col items-center  rounded-2xl border border-transparent bg-transparent px-3 py-2 text-xs font-semibold text-text/70 transition-all duration-300',
                             isActive
                               ? 'border-primary/40 text-primary'
                               : 'hover:border-primary/20 hover:text-text'
                           )}
                         >
                           {category.image ? (
-                            <span className="relative flex h-16 w-16 items-center justify-center overflow-hidden">
+                            <span className="relative flex h-20 w-24 items-center justify-center overflow-hidden">
                               <Image
                                 src={category.image}
                                 alt={category.name}
-                                width={48}
-                                height={48}
+                                width={64}
+                                height={64}
                                 className="object-contain transition-transform duration-300 group-hover:scale-105"
                               />
                             </span>
@@ -390,16 +471,6 @@ export default function MenuPage() {
                   </div>
                 </div>
               </div>
-
-              {promoBanner}
-
-              {hasDesktopResults ? (
-                desktopSections
-              ) : (
-                <div className="rounded-3xl border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-sm text-text/60">
-                  Nessun prodotto corrisponde alla ricerca. Prova a cambiare termini o categoria.
-                </div>
-              )}
 
               {dealProducts.length ? (
                 <section className="space-y-5 rounded-3xl border border-white/60 bg-white/95 p-6 shadow-soft backdrop-blur">
@@ -448,19 +519,20 @@ export default function MenuPage() {
                     >
                       {dealProducts.map((product) => {
                         const finalPrice = product.promoPrice ?? product.price;
+                        const isAvailable = product.available !== false;
                         return (
                           <div
                             key={product.id}
                             className="flex w-full flex-shrink-0 snap-start md:flex-[0_0_calc(50%-12px)] xl:flex-[0_0_520px]"
                           >
                             <article
-                              className="group flex h-full min-h-[280px] w-full flex-col overflow-hidden rounded-[32px] border border-primary/10 bg-white text-left shadow-soft transition hover:-translate-y-1 hover:shadow-lg md:flex-row"
+                              className="group flex h-full min-h-[280px] w-full flex-col overflow-hidden rounded-[32px] border border-primary/10 bg-white text-left  transition hover:-translate-y-1 hover:shadow-lg md:flex-row"
                               onClick={() => {
                                 setSelectedProduct(product);
                                 setModalOpen(true);
                               }}
                             >
-                              <div className="relative order-first h-48 w-full overflow-hidden bg-pearl/80 shadow-inner md:order-last md:h-auto md:min-h-[240px] md:w-72">
+                              <div className="relative order-first h-48 w-full overflow-hidden bg-pearl/80 shadow-inner md:order-last md:h-auto md:min-h-[180px] md:w-52">
                                 <Image
                                   src={`${product.image}?auto=format&fit=crop&w=560&q=80`}
                                   alt={product.name}
@@ -498,15 +570,18 @@ export default function MenuPage() {
                                   </div>
                                 </div>
                                 <div className="mt-auto flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                                  <div className="hidden sm:block" />
+                                  
                                   <Button
                                     className="w-full rounded-full px-6 py-2 text-sm sm:w-auto"
+                                    disabled={!isAvailable}
                                     onClick={(event) => {
                                       event.stopPropagation();
-                                      handleAdd(product);
+                                      if (isAvailable) {
+                                        handleAdd(product);
+                                      }
                                     }}
                                   >
-                                    Ordina ora
+                                    {isAvailable ? 'Ordina ora' : 'Non disponibile'}
                                   </Button>
                                 </div>
                               </div>
@@ -515,11 +590,23 @@ export default function MenuPage() {
                         );
                       })}
                     </div>
-                    <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-12 bg-gradient-to-r from-white via-white/70 to-transparent md:block" />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-12 bg-gradient-to-l from-white via-white/70 to-transparent md:block" />
+                    
+                    
                   </div>
                 </section>
               ) : null}
+
+              {promoBanner}
+
+              {hasDesktopResults ? (
+                desktopSections
+              ) : (
+                <div className="rounded-3xl border border-dashed border-gray-200 bg-white px-6 py-12 text-center text-sm text-text/60">
+                  {normalizedQuery || hasAnyProduct
+                    ? 'Nessun prodotto corrisponde alla ricerca. Prova a cambiare termini o categoria.'
+                    : 'Il menù è in aggiornamento. Torna più tardi per nuove proposte.'}
+                </div>
+              )}
             </div>
 
             <aside className="sticky top-[5.5rem] h-max">

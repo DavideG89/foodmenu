@@ -130,15 +130,15 @@ export default function Home() {
             </div>
             <div className="relative flex items-center justify-center">
               <span className="absolute -bottom-10 -left-6 hidden h-36 w-36 rounded-full bg-primary/20 blur-xl lg:block" />
-              <div className="relative z-[1] w-full max-w-[280px] overflow-hidden rounded-[28px] border-[6px] border-pearl shadow-[0_25px_45px_rgba(106,128,66,0.35)] sm:max-w-xs lg:max-w-md">
+              <div className="relative z-[1] w-full max-w-[280px] overflow-hidden rounded-[28px] border-[6px] border-pearl shadow-[0_25px_45px_rgba(106,128,66,0.35)] sm:max-w-xs lg:w-full">
                 <img
-                  src="/hamburger-2.jpg"
+                  src="/Chops-IMG/h1.png"
                   alt="Chef al lavoro in cucina"
                   className="h-full w-full max-h-[360px] object-cover"
                 />
               </div>
               <img
-                src="https://images.unsplash.com/photo-1604908176997-12518821b355?auto=format&fit=crop&w=320&q=80"
+                src="/Chops-IMG/s1.png"
                 alt="Bottiglia di salsa artigianale"
                 className="absolute -right-8 bottom-6 hidden w-32 rotate-12 rounded-3xl border-[6px] border-pearl shadow-xl sm:block"
               />
