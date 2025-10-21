@@ -825,9 +825,9 @@ const ReservationsTab = () => {
                       {statusLabel(reservation.status)}
                     </span>
                     <Button
-                      size="sm"
                       variant="secondary"
                       disabled={!nextStatus}
+                      className="px-3 py-1.5 text-xs"
                       onClick={() => advanceStatus(reservation)}
                     >
                       {nextStatus ? `→ ${statusLabel(nextStatus)}` : 'Completato'}
